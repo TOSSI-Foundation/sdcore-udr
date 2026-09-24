@@ -20,35 +20,67 @@ package datarepository
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/omec-project/openapi/v2/models"
 	"github.com/omec-project/udr/logger"
+	"github.com/omec-project/udr/producer"
+	"github.com/omec-project/util/httpwrapper"
 )
+
+// bdtDataRequest builds a producer request carrying the bdtReferenceId path
+// parameter, and the body when there is one.
+//
+// The producers for this resource take an httpwrapper.Request rather than plain
+// arguments, so the request is assembled here instead of changing their signatures:
+// the logic is already correct and already tested, and only the routing was
+// missing.
+func bdtDataRequest(c *gin.Context, body any) *httpwrapper.Request {
+	req := httpwrapper.NewRequest(c.Request, body)
+	req.Params["bdtReferenceId"] = c.Params.ByName("bdtReferenceId")
+	return req
+}
 
 // Put /policy-data/bdt-data/:bdtReferenceId
 // Creates an BDT data resource associated with an BDT reference Id
 func HTTPCreateIndividualBdtData(c *gin.Context) {
-	detail := "Handle Put /policy-data/bdt-data/:bdtReferenceId is not implemented"
-	logger.DataRepoLog.Warnln(detail)
-	writeNotImplementedProblem(c, detail)
+	logger.DataRepoLog.Debugln("Handle Put /policy-data/bdt-data/:bdtReferenceId")
+
+	// The producer asserts models.BdtData by value, not by pointer.
+	var bdtData models.BdtData
+	if !bindProducerJSON(c, &bdtData) {
+		return
+	}
+
+	rsp := producer.HandlePolicyDataBdtDataBdtReferenceIdPut(bdtDataRequest(c, bdtData))
+	writeProducerResponse(c, rsp)
 }
 
 // Delete /policy-data/bdt-data/:bdtReferenceId
 // Deletes an BDT data resource associated with an BDT reference Id
 func HTTPDeleteIndividualBdtData(c *gin.Context) {
-	detail := "Handle Delete /policy-data/bdt-data/:bdtReferenceId is not implemented"
-	logger.DataRepoLog.Warnln(detail)
-	writeNotImplementedProblem(c, detail)
+	logger.DataRepoLog.Debugln("Handle Delete /policy-data/bdt-data/:bdtReferenceId")
+
+	rsp := producer.HandlePolicyDataBdtDataBdtReferenceIdDelete(bdtDataRequest(c, nil))
+	writeProducerResponse(c, rsp)
 }
 
 // Get /policy-data/bdt-data/:bdtReferenceId
 // Retrieves the BDT data information associated with a BDT reference Id
 func HTTPReadIndividualBdtData(c *gin.Context) {
-	detail := "Handle Get /policy-data/bdt-data/:bdtReferenceId is not implemented"
-	logger.DataRepoLog.Warnln(detail)
-	writeNotImplementedProblem(c, detail)
+	logger.DataRepoLog.Debugln("Handle Get /policy-data/bdt-data/:bdtReferenceId")
+
+	rsp := producer.HandlePolicyDataBdtDataBdtReferenceIdGet(bdtDataRequest(c, nil))
+	writeProducerResponse(c, rsp)
 }
 
 // Patch /policy-data/bdt-data/:bdtReferenceId
 // Modifies an BDT data resource associated with an BDT reference Id
+//
+// Left unimplemented deliberately: unlike the other three operations there is no
+// procedure for it in producer/, so wiring it would mean writing the merge
+// semantics from scratch rather than routing to logic that already exists. Nothing
+// needs it - the PCF re-PUTs the whole BdtData when an AF selects a transfer
+// policy (producer/bdtpolicy.go: updateBDTPolicyContextProcedure) - so the honest
+// answer is still 501 rather than a half-done merge.
 func HTTPUpdateIndividualBdtData(c *gin.Context) {
 	detail := "Handle Patch /policy-data/bdt-data/:bdtReferenceId is not implemented"
 	logger.DataRepoLog.Warnln(detail)

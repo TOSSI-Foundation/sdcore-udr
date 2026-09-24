@@ -21,12 +21,20 @@ package datarepository
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/omec-project/udr/logger"
+	"github.com/omec-project/udr/producer"
+	"github.com/omec-project/util/httpwrapper"
 )
 
 // Get /policy-data/bdt-data
 // Retrieves the BDT data collection
+//
+// The PCF calls this on every Npcf_BDTPolicyControl create and treats anything
+// other than 200 as fatal, answering the AF 503 "UDR query failed". While this
+// route returned 501 the whole background-data-transfer negotiation was dead, even
+// though the logic below has always been present in producer/.
 func HTTPReadBdtData(c *gin.Context) {
-	detail := "Handle Get /policy-data/bdt-data is not implemented"
-	logger.DataRepoLog.Warnln(detail)
-	writeNotImplementedProblem(c, detail)
+	logger.DataRepoLog.Debugln("Handle Get /policy-data/bdt-data")
+
+	rsp := producer.HandlePolicyDataBdtDataGet(httpwrapper.NewRequest(c.Request, nil))
+	writeProducerResponse(c, rsp)
 }
