@@ -20,29 +20,47 @@ package datarepository
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/omec-project/openapi/v2/models"
 	"github.com/omec-project/udr/logger"
+	"github.com/omec-project/udr/producer"
 )
 
 // Put /application-data/influenceData/:influenceId
 // Create or update an individual Influence Data resource
 func HTTPCreateOrReplaceIndividualInfluenceData(c *gin.Context) {
-	detail := "Handle Put /application-data/influenceData/:influenceId is not implemented"
-	logger.DataRepoLog.Warnln(detail)
-	writeNotImplementedProblem(c, detail)
+	logger.DataRepoLog.Debugln("Handle Put /application-data/influenceData/:influenceId")
+
+	var trInfluData models.TrafficInfluData
+	if !bindProducerJSON(c, &trInfluData) {
+		return
+	}
+
+	rsp := producer.HandleApplicationDataInfluenceDataInfluenceIdPut(
+		c.Params.ByName("influenceId"), &trInfluData)
+	writeProducerResponse(c, rsp)
 }
 
 // Delete /application-data/influenceData/:influenceId
 // Delete an individual Influence Data resource
 func HTTPDeleteIndividualInfluenceData(c *gin.Context) {
-	detail := "Handle Delete /application-data/influenceData/:influenceId is not implemented"
-	logger.DataRepoLog.Warnln(detail)
-	writeNotImplementedProblem(c, detail)
+	logger.DataRepoLog.Debugln("Handle Delete /application-data/influenceData/:influenceId")
+
+	rsp := producer.HandleApplicationDataInfluenceDataInfluenceIdDelete(
+		c.Params.ByName("influenceId"))
+	writeProducerResponse(c, rsp)
 }
 
 // Patch /application-data/influenceData/:influenceId
-// Modify part of the properties of an individual Influence Data resource
+// Modify an individual Influence Data resource
 func HTTPUpdateIndividualInfluenceData(c *gin.Context) {
-	detail := "Handle Patch /application-data/influenceData/:influenceId is not implemented"
-	logger.DataRepoLog.Warnln(detail)
-	writeNotImplementedProblem(c, detail)
+	logger.DataRepoLog.Debugln("Handle Patch /application-data/influenceData/:influenceId")
+
+	var trInfluDataPatch models.TrafficInfluDataPatch
+	if !bindProducerJSON(c, &trInfluDataPatch) {
+		return
+	}
+
+	rsp := producer.HandleApplicationDataInfluenceDataInfluenceIdPatch(
+		c.Params.ByName("influenceId"), &trInfluDataPatch)
+	writeProducerResponse(c, rsp)
 }

@@ -21,12 +21,16 @@ package datarepository
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/omec-project/udr/logger"
+	"github.com/omec-project/udr/producer"
 )
 
 // Get /application-data/influenceData
-// Retrieve Traffic Influence Data
+// Retrieve applicable Influence Data
 func HTTPReadInfluenceData(c *gin.Context) {
-	detail := "Handle Get /application-data/influenceData is not implemented"
-	logger.DataRepoLog.Warnln(detail)
-	writeNotImplementedProblem(c, detail)
+	logger.DataRepoLog.Debugln("Handle Get /application-data/influenceData")
+
+	// The producer selects on influence-Ids / dnns / snssais /
+	// internal-Group-Ids / supis and rejects the request if none are present.
+	rsp := producer.HandleApplicationDataInfluenceDataGet(c.Request.URL.Query())
+	writeProducerResponse(c, rsp)
 }

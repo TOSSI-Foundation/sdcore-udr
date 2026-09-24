@@ -20,29 +20,39 @@ package datarepository
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/omec-project/openapi/v2/models"
 	"github.com/omec-project/udr/logger"
+	"github.com/omec-project/udr/producer"
 )
 
 // Put /application-data/pfds/:appId
 // Create or update the corresponding PFDs for the specified application identifier
 func HTTPCreateOrReplaceIndividualPFDData(c *gin.Context) {
-	detail := "Handle Put /application-data/pfds/:appId is not implemented"
-	logger.DataRepoLog.Warnln(detail)
-	writeNotImplementedProblem(c, detail)
+	logger.DataRepoLog.Debugln("Handle Put /application-data/pfds/:appId")
+
+	var pfdDataForApp models.PfdDataForApp
+	if !bindProducerJSON(c, &pfdDataForApp) {
+		return
+	}
+
+	rsp := producer.HandleApplicationDataPfdsAppIdPut(c.Params.ByName("appId"), &pfdDataForApp)
+	writeProducerResponse(c, rsp)
 }
 
 // Delete /application-data/pfds/:appId
 // Delete the corresponding PFDs of the specified application identifier
 func HTTPDeleteIndividualPFDData(c *gin.Context) {
-	detail := "Handle Delete /application-data/pfds/:appId is not implemented"
-	logger.DataRepoLog.Warnln(detail)
-	writeNotImplementedProblem(c, detail)
+	logger.DataRepoLog.Debugln("Handle Delete /application-data/pfds/:appId")
+
+	rsp := producer.HandleApplicationDataPfdsAppIdDelete(c.Params.ByName("appId"))
+	writeProducerResponse(c, rsp)
 }
 
 // Get /application-data/pfds/:appId
 // Retrieve the corresponding PFDs of the specified application identifier
 func HTTPReadIndividualPFDData(c *gin.Context) {
-	detail := "Handle Get /application-data/pfds/:appId is not implemented"
-	logger.DataRepoLog.Warnln(detail)
-	writeNotImplementedProblem(c, detail)
+	logger.DataRepoLog.Debugln("Handle Get /application-data/pfds/:appId")
+
+	rsp := producer.HandleApplicationDataPfdsAppIdGet(c.Params.ByName("appId"))
+	writeProducerResponse(c, rsp)
 }

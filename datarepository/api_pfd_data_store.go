@@ -21,12 +21,18 @@ package datarepository
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/omec-project/udr/logger"
+	"github.com/omec-project/udr/producer"
 )
 
 // Get /application-data/pfds
-// Retrieve PFDs for application identifier(s)
+// Retrieve PFDs for all or one specific application identifier(s)
 func HTTPReadPFDData(c *gin.Context) {
-	detail := "Handle Get /application-data/pfds is not implemented"
-	logger.DataRepoLog.Warnln(detail)
-	writeNotImplementedProblem(c, detail)
+	logger.DataRepoLog.Debugln("Handle Get /application-data/pfds")
+
+	// 3GPP TS 29.504 names this "appId"; accept the spellings emitted by
+	// existing free5GC/omec NEF clients too.
+	appIDs := appDataQueryIDs(c, "appId", "app-ids", "appIds")
+
+	rsp := producer.HandleApplicationDataPfdsGet(appIDs)
+	writeProducerResponse(c, rsp)
 }
